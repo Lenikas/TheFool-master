@@ -14,10 +14,10 @@ namespace Fool
 
     public class GameModel
     {
-        public List<Card> GamerHand { get; private set; }
+        public List<Card> GamerHand { get; set; }
         public Queue<Card> Deck { get; private set; }
-        public List<Card> BotHand { get; private set; }
-        public DeskCardsSlot DeskCards { get; private set; }
+        public List<Card> BotHand { get; set; }
+        public DeskCardsSlot DeskCards { get; set; }
         public Players WhosTurn { get; private set; }
         public Card TrumpCard { get; private set; }
         private Random rnd = new Random();
@@ -51,6 +51,16 @@ namespace Fool
             WhosTurn = WhoFirst();
             if (WhosTurn == Players.Bot)
                 TurnBot2Player();
+        }
+
+        public GameModel(List<Card> botHand, List<Card> gamerHand, Queue<Card> deck, DeskCardsSlot deskCards, Card trumpCard, Players whosTurn)
+        {
+            GamerHand = gamerHand;
+            Deck = deck;
+            BotHand = botHand;
+            DeskCards = deskCards;
+            WhosTurn = whosTurn;
+            TrumpCard = trumpCard;
         }
 
         public Tuple<string, string> CloseBotCard(int gamerCardNumber)
@@ -126,15 +136,31 @@ namespace Fool
                 if(WhosTurn == Players.Gamer)
                 {
                     DeskCards.Clear();
-                    GamerHand.Add(Deck.Dequeue());
-                    BotHand.Add(Deck.Dequeue());
+
+                    try
+                    {
+                        BotHand.Add(Deck.Dequeue());
+                        GamerHand.Add(Deck.Dequeue());
+                    }
+                    catch (InvalidOperationException)
+                    {
+
+                    }
+
                     WhosTurn = Players.Bot;
                 }
                 else
                 {
                     DeskCards.Clear();
-                    BotHand.Add(Deck.Dequeue());
-                    GamerHand.Add(Deck.Dequeue());
+                    try
+                    {
+                        BotHand.Add(Deck.Dequeue());
+                        GamerHand.Add(Deck.Dequeue());
+                    }
+                    catch(InvalidOperationException)
+                    {
+
+                    }
                     WhosTurn = Players.Gamer;
                 }
             }
@@ -144,13 +170,27 @@ namespace Fool
                 {
                     BotHand.Add(DeskCards.Back);
                     DeskCards.Clear();
-                    GamerHand.Add(Deck.Dequeue());
+                    try
+                    {
+                        GamerHand.Add(Deck.Dequeue());
+                    }
+                    catch (InvalidOperationException)
+                    {
+
+                    }
                 }
                 else
                 {
                     GamerHand.Add(DeskCards.Back);
                     DeskCards.Clear();
-                    BotHand.Add(Deck.Dequeue());
+                    try
+                    {
+                        BotHand.Add(Deck.Dequeue());
+                    }
+                    catch (InvalidOperationException)
+                    {
+
+                    }
                 }
             }
 

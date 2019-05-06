@@ -23,6 +23,7 @@ namespace Fool
             this.ClientSize = new Size(600, 550);
             this.BackColor = Color.Green;
             this.Name = "Fool";
+            Controls.Clear();
 
             if (game.BotHand.Count == 0)
                 OnLoseGame();
@@ -39,32 +40,32 @@ namespace Fool
                     if (game.WhosTurn == Players.Bot)
                     {
                         var result = game.CloseBotCard(iCardNumber);
-                        Refresh();
+                        RedrawAll(game);
                         if (result != null)
                             OnWarningMessage(result.Item1, result.Item2);
                         else
                         {
                             Thread.Sleep(500);
                             game.CloseTurn();
-                            Refresh();
+                            RedrawAll(game);
                         }
                     }
                     else if (game.WhosTurn == Players.Gamer)
                     {
                         game.TurnPlayer2Bot(iCardNumber);
-                        Refresh();
+                        RedrawAll(game);
                         Thread.Sleep(500);
                         game.CloseGamerCard();
-                        Refresh();
+                        RedrawAll(game);
                         Thread.Sleep(500);
                         game.CloseTurn();
-                        Refresh();
+                        RedrawAll(game);
                         if (game.WhosTurn == Players.Bot)
                             game.TurnBot2Player();
-                        Refresh();
+                        RedrawAll(game);
                     }
-                    
-                    Refresh();
+
+                    RedrawAll(game);
                 };
             }
 
@@ -173,6 +174,78 @@ namespace Fool
                     Location = new Point(48, 264)
                 });
             return result;
+        }
+
+        public void RedrawAll(GameModel game)
+        {
+            Controls.Clear();
+
+            if (game.BotHand.Count == 0)
+                OnLoseGame();
+            if (game.GamerHand.Count == 0)
+                OnWinGame();
+
+            gamerCards = DrawPlayersCards(game.GamerHand, 33, 422, false);
+            for (int cardNumber = gamerCards.Count - 1; cardNumber > -1; cardNumber--)
+            {
+                var iCardNumber = cardNumber;
+                Controls.Add(gamerCards[cardNumber]);
+                gamerCards[cardNumber].Click += (sender, args) =>
+                {
+                    if (game.WhosTurn == Players.Bot)
+                    {
+                        var result = game.CloseBotCard(iCardNumber);
+                        RedrawAll(game);
+                        if (result != null)
+                            OnWarningMessage(result.Item1, result.Item2);
+                        else
+                        {
+                            Thread.Sleep(500);
+                            game.CloseTurn();
+                            RedrawAll(game);
+                        }
+                    }
+                    else if (game.WhosTurn == Players.Gamer)
+                    {
+                        game.TurnPlayer2Bot(iCardNumber);
+                        RedrawAll(game);
+                        Thread.Sleep(500);
+                        game.CloseGamerCard();
+                        RedrawAll(game);
+                        Thread.Sleep(500);
+                        game.CloseTurn();
+                        RedrawAll(game);
+                        if (game.WhosTurn == Players.Bot)
+                            game.TurnBot2Player();
+                        RedrawAll(game);
+                    }
+
+                    RedrawAll(game);
+                };
+            }
+
+            botCards = DrawPlayersCards(game.BotHand, 33, 32, true);
+            for (int i = botCards.Count - 1; i >= 0; i--)
+                Controls.Add(botCards[i]);
+
+            PictureBox deck;
+            if (game.Deck.Count > 1)
+            {
+                deck = new PictureBox
+                {
+                    Size = new Size(Resource1.coloda.Width, Resource1.coloda.Height),
+                    Image = Resource1.coloda,
+                    Location = new Point(491, 400)
+                };
+                Controls.Add(deck);
+            }
+
+            if (game.DeskCards != null)
+            {
+                deskCards = DrawDeskCards(game.DeskCards);
+                foreach (var card in deskCards)
+                    Controls.Add(card);
+            }
         }
     }
 }
