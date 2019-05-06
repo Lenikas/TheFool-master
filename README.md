@@ -1,1 +1,3 @@
-## Игра "Дурак"
+## Game "Fool"
+
+Our cool game
