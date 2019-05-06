@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1CE56813-6BCD-4DA7-B66B-3F7CD1C379BF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Fool</RootNamespace>
+    <AssemblyName>Fool</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Card.cs" />
+    <Compile Include="DeskCardSlot.cs" />
+    <Compile Include="FoolForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Game.cs" />
+    <Compile Include="GameModel.cs" />
+    <Compile Include="GameState.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource1.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="FoolForm.resx">
+      <DependentUpon>FoolForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Resource1.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-6.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-7.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-8.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-10.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-11.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-12.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-13.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1-14.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-6.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-7.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-8.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-10.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-11.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-12.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-13.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2-14.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-6.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-7.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-8.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-10.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-11.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-12.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-13.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3-14.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-6.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-7.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-8.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-9.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-10.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-11.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-12.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-13.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4-14.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\coloda.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\fon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\single.bmp" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
