@@ -97,5 +97,45 @@ namespace Fool
 
             Assert.AreEqual("Нарушение правил", result.Item1);
         }
+
+        [Test]
+        public void TestRightTransferPlayerToBot()
+        {
+            botHand = new List<Card> { Card.CleanDeck[0] };
+            gamerHand = new List<Card> { Card.CleanDeck[1] };
+
+            var whosTurn = Players.Bot;
+            var trumpCard = Card.CleanDeck[2];
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(null) };
+            desk.Clear();
+            var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
+
+            game.TurnBot2Player();
+            var canTransfer = game.CanTransferPlayer(0);
+            game.DoTransferPlayer(0);
+
+            Assert.AreEqual(true, canTransfer);
+            Assert.AreEqual(2, game.DeskCards.Count);
+        }
+
+        [Test]
+        public void TestRightTransferBotToPlayer()
+        {
+            botHand = new List<Card> { Card.CleanDeck[0] };
+            gamerHand = new List<Card> { Card.CleanDeck[1] };
+
+            var whosTurn = Players.Gamer;
+            var trumpCard = Card.CleanDeck[2];
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(null) };
+            desk.Clear();
+            var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
+
+            game.TurnPlayer2Bot(0);
+            var canTransfer = game.CanTransferBot();
+            game.DoTransferBot();
+
+            Assert.AreEqual(true, canTransfer);
+            Assert.AreEqual(2, game.DeskCards.Count);
+        }
     }
 }

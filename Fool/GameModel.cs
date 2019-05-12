@@ -62,10 +62,25 @@ namespace Fool
 
         public Tuple<string, string> CloseBotCard(int gamerCardNumber)
         {
-            if (!IsClosingRight(GamerHand[gamerCardNumber], DeskCards[0].Back))
-                return new Tuple<string, string>("Нарушение правил", "Неправильно выбрана карта");
-            DeskCards[0].Close(GamerHand[gamerCardNumber]);
-            GamerHand.RemoveAt(gamerCardNumber);
+
+            //if (CanTransferPlayer(gamerCardNumber))
+            //{
+            //    DoTransferPlayer(gamerCardNumber);
+            //    return null;
+            //}
+            foreach (var cardDesk in DeskCards)
+            {
+                if (IsClosingRight(GamerHand[gamerCardNumber], cardDesk.Back))
+                {
+                    cardDesk.Close(GamerHand[gamerCardNumber]);
+                    GamerHand.RemoveAt(gamerCardNumber);
+                }
+                else
+                {
+                    return new Tuple<string, string>("Нарушение правил", "Неправильно выбрана карта");
+                }
+            }
+
             return null;
         }
 
@@ -117,6 +132,43 @@ namespace Fool
                 break;
             }
         }
+        //public void TryCloseAnyGamerCard()
+        //{
+        //    var i = DeskCards.Count;
+        //    foreach (var cardDesk in DeskCards)
+        //    {
+        //        foreach (var card in BotHand)
+        //        {
+        //            if (IsClosingRight(card, cardDesk.Back))
+        //            {
+        //                cardDesk.Close(card);
+        //                BotHand.Remove(card);
+        //                i--;
+        //                break;
+        //            }
+        //        }
+        //    }
+
+        //    if (i != 0)
+        //    {
+        //        foreach (var card in DeskCards)
+        //        {
+        //            BotHand.Add(card.Back);
+        //            if (card.Fore != null)
+        //                BotHand.Add(card.Fore);
+        //        }
+        //        Thread.Sleep(1000);
+        //        DeskCards.Clear();
+        //        AddCardsToGamersHands();
+        //    }
+
+        //    if (i == 0)
+        //    {
+        //        DeskCards.Clear();
+        //        AddCardsToGamersHands();  
+        //        WhosTurn = Players.Bot;
+        //    }
+        //}
 
         public void CloseTurn()
         {
@@ -188,32 +240,124 @@ namespace Fool
                 return;
             if (WhosTurn == Players.Gamer)
             {
-                while (GamerHand.Count < 6 && Deck.Count != 0)
-                {
-                    GamerHand.Add(Deck.Dequeue());
-                    GamerHand.Remove(null);
-                }
-
-                while (BotHand.Count < 6 && Deck.Count != 0)
-                {
-                    BotHand.Add(Deck.Dequeue());
-                    BotHand.Remove(null);
-                }
+                DoDistribute(GamerHand, BotHand);
             }
-            else if (WhosTurn == Players.Bot)
+
+            if (WhosTurn == Players.Bot)
             {
-                while (BotHand.Count < 6 && Deck.Count != 0)
-                {
-                    BotHand.Add(Deck.Dequeue());
-                    BotHand.Remove(null);
-                }
+                DoDistribute(BotHand, GamerHand);
+            }
+        }
 
-                while (GamerHand.Count < 6 && Deck.Count != 0)
+        private void DoDistribute(List<Card> handOne, List<Card> handTwo)
+        {
+            while (handOne.Count < 6 && Deck.Count != 0)
+            {
+                handOne.Add(Deck.Dequeue());
+                handOne.Remove(null);
+            }
+            while (handTwo.Count < 6 && Deck.Count != 0)
+            {
+                handTwo.Add(Deck.Dequeue());
+                handTwo.Remove(null);
+            }
+        }
+
+        public bool CanTransferBot()
+        {
+            var cardForTransfer = DeskCards.Last().Back;
+            foreach (var card in BotHand)
+                if (card.Rank == cardForTransfer.Rank)
+                    return true;
+
+            return false;
+        }
+
+        public void DoTransferBot()
+        {
+           
+            var cardForTransfer = DeskCards.Last().Back;
+            foreach (var card in BotHand)
+                if (card.Rank == cardForTransfer.Rank)
                 {
-                    GamerHand.Add(Deck.Dequeue());
-                    GamerHand.Remove(null);
+                    DeskCards.Add(new DeskCardsSlot(card));
+                    BotHand.Remove(card);
+                    WhosTurn = Players.Bot;
+                    break;
+                }
+        }
+
+        public bool CanTransferPlayer(int gamerCardNumber)
+        {
+            var cardForTransfer = DeskCards.Last().Back;
+            if (GamerHand[gamerCardNumber].Rank == cardForTransfer.Rank)
+                return true;
+            return false;
+        }
+
+        public void DoTransferPlayer(int gamerCardNumber)
+        {
+            
+            DeskCards.Add(new DeskCardsSlot(GamerHand[gamerCardNumber]));
+            GamerHand.RemoveAt(gamerCardNumber);
+            // WhosTurn = Players.Bot;
+        }
+
+        public bool CanBotToss()
+        {
+            foreach (var cardDesk in DeskCards)
+            {
+                foreach (var cardBot in BotHand)
+
+                {
+                    if (cardDesk.Fore.Rank == cardBot.Rank || cardDesk.Back.Rank == cardBot.Rank)
+                    {
+                        return true;
+                    }
                 }
             }
+
+
+            return false;
+        }
+
+        public void DoTossBot()
+        {
+            foreach (var cardDesk in DeskCards)
+
+            {
+                foreach (var cardBot in BotHand)
+                {
+                    if (cardDesk.Fore.Rank == cardBot.Rank || cardDesk.Back.Rank == cardBot.Rank)
+                    {
+                        if (DeskCards.Count < 5)
+                        {
+                            DeskCards.Add(new DeskCardsSlot(cardBot));
+                            BotHand.Remove(cardBot);
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        public bool CanPlayerToss(int cardNumber)
+        {
+            foreach (var cardDesk in DeskCards)
+            {
+                if (cardDesk.Back.Rank == GamerHand[cardNumber].Rank ||
+                    cardDesk.Fore.Rank == GamerHand[cardNumber].Rank)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void DoPlayerToss(int cardNumber)
+        {
+            DeskCards.Add(new DeskCardsSlot(GamerHand[cardNumber]));
+            GamerHand.RemoveAt(cardNumber);
         }
     }
 

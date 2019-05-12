@@ -59,7 +59,7 @@ namespace Fool
             new Card { Rank = 14, Suit = Suits.Heart,    Image = Resource1._2_14 },
             new Card { Rank = 14, Suit = Suits.Diamond,  Image = Resource1._3_14 },
             new Card { Rank = 14, Suit = Suits.Club,     Image = Resource1._4_14 },
-        };
+        
             new Card { Rank = 6, Suit = Suits.Heart,    Image = Resource1._2_6 },
             new Card { Rank = 6, Suit = Suits.Diamond,  Image = Resource1._3_6 },
             new Card { Rank = 6, Suit = Suits.Club,     Image = Resource1._4_6 },
