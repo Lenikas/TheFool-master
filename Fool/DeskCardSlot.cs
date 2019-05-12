@@ -10,24 +10,28 @@ namespace Fool
     {
         public Card Fore { get; private set; }
         public Card Back { get; private set; }
-        public bool Closed { get; private set; }
+        public bool ContainsBack { get; private set; }
+        public bool ContainsFore { get; private set; }
 
         public DeskCardsSlot(Card back)
         {
             Back = back;
+            ContainsBack = true;
+            ContainsFore = false;
         }
 
         public void Close(Card fore)
         {
             Fore = fore;
-            Closed = true;
+            ContainsFore = true;
         }
 
         public void Clear()
         {
             Fore = null;
             Back = null;
-            Closed = false;
+            ContainsBack = false;
+            ContainsFore = false;
         }
     }
 }

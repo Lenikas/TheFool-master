@@ -131,70 +131,36 @@ namespace Fool
 
         public void CloseTurn()
         {
-            if (DeskCards.Closed == true)
+            if (DeskCards.ContainsFore == true)
             {
                 if(WhosTurn == Players.Gamer)
                 {
                     DeskCards.Clear();
-
-                    try
-                    {
-                        BotHand.Add(Deck.Dequeue());
-                        GamerHand.Add(Deck.Dequeue());
-                    }
-                    catch (InvalidOperationException)
-                    {
-
-                    }
-
+                    AddCardsToGamersHands();
                     WhosTurn = Players.Bot;
                 }
                 else
                 {
                     DeskCards.Clear();
-                    try
-                    {
-                        BotHand.Add(Deck.Dequeue());
-                        GamerHand.Add(Deck.Dequeue());
-                    }
-                    catch(InvalidOperationException)
-                    {
-
-                    }
+                    AddCardsToGamersHands();
                     WhosTurn = Players.Gamer;
                 }
             }
-            else
+            if (DeskCards.ContainsFore == false)
             {
                 if (WhosTurn == Players.Gamer)
                 {
                     BotHand.Add(DeskCards.Back);
                     DeskCards.Clear();
-                    try
-                    {
-                        GamerHand.Add(Deck.Dequeue());
-                    }
-                    catch (InvalidOperationException)
-                    {
-
-                    }
+                    AddCardsToGamersHands();
                 }
                 else
                 {
                     GamerHand.Add(DeskCards.Back);
                     DeskCards.Clear();
-                    try
-                    {
-                        BotHand.Add(Deck.Dequeue());
-                    }
-                    catch (InvalidOperationException)
-                    {
-
-                    }
+                    AddCardsToGamersHands();
                 }
             }
-
-
         }
 
         public bool IsClosingRight (Card fore, Card back)
@@ -223,6 +189,42 @@ namespace Fool
                     rank = card.Rank;
                 }
             return result;
+        }
+
+        private void AddCardsToGamersHands()
+        {
+            GamerHand.Remove(null);
+            BotHand.Remove(null);
+            if (Deck == null)
+                return;
+            if (WhosTurn == Players.Gamer)
+            {
+                while (GamerHand.Count < 6 && Deck.Count != 0)
+                {
+                    GamerHand.Add(Deck.Dequeue());
+                    GamerHand.Remove(null);
+                }
+                while (BotHand.Count < 6 && Deck.Count != 0)
+                {
+                    BotHand.Add(Deck.Dequeue());
+                    BotHand.Remove(null);
+                }
+            }
+
+            if (WhosTurn == Players.Bot)
+            {
+                while (BotHand.Count < 6 && Deck.Count != 0)
+                {
+                    BotHand.Add(Deck.Dequeue());
+                    BotHand.Remove(null);
+                }
+                while (GamerHand.Count < 6 && Deck.Count != 0)
+                {
+                    GamerHand.Add(Deck.Dequeue());
+                    GamerHand.Remove(null);
+                }
+                    
+            }
         }
     }
 

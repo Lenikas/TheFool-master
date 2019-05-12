@@ -9,103 +9,241 @@ using System.Windows.Forms;
 
 namespace Fool
 {
-    public class FoolForm : Form
+    class FoolForm : Form
     {
         GameModel game;
-        
-        private List<PictureBox> botCards;
-        private List<PictureBox> gamerCards;
-        private List<PictureBox> deskCards;
+        private PictureBox trump;
+        private PictureBox deck;
+        private List<PictureBox> botHand;
+        private List<PictureBox> gamerHand;
+        private List<PictureBox> deskBack;
+        private List<PictureBox> deskFore;
+        private Button closeTurnButton;
 
         public FoolForm(GameModel game)
         {
             this.game = game;
-            this.ClientSize = new Size(600, 550);
-            this.BackColor = Color.Green;
-            this.Name = "Fool";
+
+            ClientSize = new Size(600, 550);
+            BackColor = Color.Green;
+            Name = "Fool";
             Controls.Clear();
 
-            if (game.BotHand.Count == 0)
-                OnLoseGame();
-            if (game.GamerHand.Count == 0)
-                OnWinGame();
-
-            gamerCards = DrawPlayersCards(game.GamerHand, 33, 422, false);
-            for(int cardNumber = gamerCards.Count - 1; cardNumber > -1; cardNumber--)
-            {
-                var iCardNumber = cardNumber;
-                Controls.Add(gamerCards[cardNumber]);
-                gamerCards[cardNumber].Click += (sender, args) =>
-                {
-                    if (game.WhosTurn == Players.Bot)
-                    {
-                        var result = game.CloseBotCard(iCardNumber);
-                        RedrawAll(game);
-                        if (result != null)
-                            OnWarningMessage(result.Item1, result.Item2);
-                        else
-                        {
-                            Thread.Sleep(500);
-                            game.CloseTurn();
-                            RedrawAll(game);
-                        }
-                    }
-                    else if (game.WhosTurn == Players.Gamer)
-                    {
-                        game.TurnPlayer2Bot(iCardNumber);
-                        RedrawAll(game);
-                        Thread.Sleep(500);
-                        game.CloseGamerCard();
-                        RedrawAll(game);
-                        Thread.Sleep(500);
-                        game.CloseTurn();
-                        RedrawAll(game);
-                        if (game.WhosTurn == Players.Bot)
-                            game.TurnBot2Player();
-                        RedrawAll(game);
-                    }
-
-                    RedrawAll(game);
-                };
-            }
-
-            botCards = DrawPlayersCards(game.BotHand, 33, 32, true);
-            for (int i = botCards.Count - 1; i >= 0; i--)
-                Controls.Add(botCards[i]);
-
-            PictureBox trump;
-            if(game.Deck.Contains(game.TrumpCard))
-            {
-                trump = new PictureBox
-                {
-                    Size = new Size(game.TrumpCard.Image.Width, game.TrumpCard.Image.Height),
-                    Image = game.TrumpCard.Image,
-                    Location = new Point(459, 430)
-                };
-                Controls.Add(trump);
-            }
-                
-            PictureBox deck;
-            if (game.Deck.Count > 1)
-            {
-                deck = new PictureBox
-                {
-                    Size = new Size(Resource1.coloda.Width, Resource1.coloda.Height),
-                    Image = Resource1.coloda,
-                    Location = new Point(491, 400)
-                };
-                Controls.Add(deck);
-            }
-
-            if(game.DeskCards != null)
-            {
-                deskCards = DrawDeskCards(game.DeskCards);
-                foreach (var card in deskCards)
-                    Controls.Add(card);
-            }
-
+            InitializeFormComponents();
+            AddComponentsToControls();
+            RefreshImages();
+            AddClickToGamerHand();
             FormBorderStyle = FormBorderStyle.FixedDialog;
 
+        }
+
+        private void InitializeFormComponents()
+        {
+            closeTurnButton = new Button
+            {
+                Location = new Point(459, 350),
+                Size = new Size(Resource1.coloda.Width + 32, 25),
+                BackColor = Color.White,
+                Text = "Завершить ход"
+            };
+
+            closeTurnButton.Click += (sender, args) =>
+            {
+                if (game.WhosTurn == Players.Bot)
+                    if (OnQuestionMessage("Подтвердите действие", "Взять карты?"))
+                    {
+                        game.CloseTurn();
+                        RefreshImages();
+                        Thread.Sleep(2000);
+                        GetCardFromBot();
+                        RefreshImages();
+                    }
+            };
+
+            var image = game.TrumpCard.Image;
+            image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            trump = new PictureBox()
+            {
+                Image = image,
+                Size = Card.CardSize,
+                Location = new Point(459, 415)
+            };
+
+            deck = new PictureBox()
+            {
+                Image = Resource1.coloda,
+                Size = new Size(Resource1.coloda.Width, Resource1.coloda.Height),
+                Location = new Point(491, 400)
+            };
+
+            gamerHand = new List<PictureBox>();
+            botHand = new List<PictureBox>();
+            var delta = 15;
+
+            for (int i = 0; i < 36; i++)
+            {
+                gamerHand.Add(new PictureBox
+                {
+                    Size = Card.CardSize,
+                    Location = new Point(33 + delta * i, 422)
+                });
+
+                botHand.Add(new PictureBox
+                {
+                    Size = Card.CardSize,
+                    Location = new Point(33 + delta * i, 32)
+                });
+            }
+
+            deskBack = new List<PictureBox>();
+            deskFore = new List<PictureBox>();
+
+            deskBack.Add(new PictureBox
+            {
+                Size = Card.CardSize,
+                Location = new Point(33, 249)
+            });
+
+            deskFore.Add(new PictureBox
+            {
+                Size = Card.CardSize,
+                Location = new Point(48, 264)
+            });
+        }
+
+        private void AddComponentsToControls()
+        {
+            Controls.Add(trump);
+            Controls.Add(deck);
+            Controls.Add(closeTurnButton);
+            foreach (var box in botHand)
+                Controls.Add(box);
+            foreach (var box in gamerHand)
+                Controls.Add(box);
+            foreach (var box in deskBack)
+                Controls.Add(box);
+            foreach (var box in deskFore)
+                Controls.Add(box);
+        }
+
+        private void RefreshImages()
+        {
+            for (int i = 0; i < gamerHand.Count; i++)
+            {
+                if (i < game.GamerHand.Count && game.GamerHand[i] != null)
+                {
+                    gamerHand[i].Image = game.GamerHand[i].Image;
+                    gamerHand[i].BringToFront();
+                }
+                else
+                    gamerHand[i].Image = null;
+            }
+
+            for (int i = 0; i < botHand.Count; i++)
+            {
+                if (i < game.BotHand.Count)
+                {
+                    botHand[i].Image = Resource1.fon;
+                    botHand[i].BringToFront();
+                }
+                else
+                    botHand[i].Image = null;
+            }
+
+            if (!game.Deck.Contains(game.TrumpCard))
+            {
+                if (trump.Image != null)
+                    trump.Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                trump.Image = null;
+            }
+
+
+            if (game.Deck.Count != 0)
+            {
+                deck.Image = Resource1.coloda;
+                deck.BringToFront();
+            }
+            else
+                deck.Image = null;
+
+            if (game.DeskCards != null && game.DeskCards.ContainsBack)
+            {
+                deskBack[0].Image = game.DeskCards.Back.Image;
+                deskBack[0].BringToFront();
+            }
+            else
+                deskBack[0].Image = null;
+
+            if (game.DeskCards != null && game.DeskCards.ContainsFore)
+            {
+                deskFore[0].Image = game.DeskCards.Fore.Image;
+                deskFore[0].BringToFront();
+            }
+            else
+                deskFore[0].Image = null;
+
+            Update();
+            Invalidate();
+            Refresh();
+
+            if (game.BotHand.Count == 0 && game.DeskCards.Back == null)
+                OnLoseGame();
+            if (game.GamerHand.Count == 0 && game.DeskCards.Back == null)
+                OnWinGame();
+        }
+
+        private void AddClickToGamerHand()
+        {
+            for (int i = 0; i < 36; i++)
+            {
+                var iCardNumber = i;
+                gamerHand[i].Click += (sender, args) =>
+                {
+                    if (iCardNumber < game.GamerHand.Count)
+                    {
+                        if (game.WhosTurn == Players.Bot)
+                            DoTurnFromBot(iCardNumber);
+                        else if (game.WhosTurn == Players.Gamer)
+                        {
+                            DoTurnToBot(iCardNumber);
+                            GetCardFromBot();
+                        }
+                    }
+                };
+            }
+        }
+
+        private void DoTurnFromBot(int cardNumber)
+        {
+            var result = game.CloseBotCard(cardNumber);
+            RefreshImages();
+            if (result != null)
+                OnWarningMessage(result.Item1, result.Item2);
+            else
+            {
+                Thread.Sleep(2000);
+                game.CloseTurn();
+                RefreshImages();
+            }
+        }
+
+        private void DoTurnToBot(int cardNumber)
+        {
+            game.TurnPlayer2Bot(cardNumber);
+            RefreshImages();
+            Thread.Sleep(2000);
+            game.CloseGamerCard();
+            RefreshImages();
+            Thread.Sleep(2000);
+            game.CloseTurn();
+            RefreshImages();
+        }
+
+        private void GetCardFromBot()
+        {
+            if (game.WhosTurn == Players.Bot)
+                game.TurnBot2Player();
+            RefreshImages();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs args)
@@ -117,11 +255,15 @@ namespace Fool
         protected void OnWinGame()
         {
             var result = MessageBox.Show("Вы победили!", "Игра закончена", MessageBoxButtons.OK, MessageBoxIcon.None);
+            if (result == DialogResult.OK)
+                OnFormClosing(new FormClosingEventArgs(CloseReason.ApplicationExitCall, false));
         }
 
         protected void OnLoseGame()
         {
-            var result = MessageBox.Show("Вы ппроиграли!", "Игра закончена", MessageBoxButtons.OK, MessageBoxIcon.None);
+            var result = MessageBox.Show("Вы проиграли!", "Игра закончена", MessageBoxButtons.OK, MessageBoxIcon.None);
+            if (result == DialogResult.OK)
+                OnFormClosing(new FormClosingEventArgs(CloseReason.ApplicationExitCall, false));
         }
 
         protected void OnWarningMessage(string caption, string text)
@@ -129,123 +271,10 @@ namespace Fool
             var result = MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
-        protected List<PictureBox> DrawPlayersCards(List<Card> hand, int startX, int startY, bool hideCards)
+        protected bool OnQuestionMessage(string caption, string text)
         {
-            var result = new List<PictureBox>();
-            var delta = 0;
-            Bitmap cardImage;
-
-            foreach (var card in hand)
-            {
-                if (hideCards)
-                    cardImage = Resource1.single;
-                else
-                    cardImage = card.Image;
-                    
-                result.Add(new PictureBox
-                {
-                    Size = new Size(cardImage.Width, cardImage.Height),
-                    Image = cardImage,
-                    Location = new Point(startX + delta, startY)
-                });
-
-                delta += 15;
-            }
-
-            return result;
-        }
-
-        public List<PictureBox> DrawDeskCards(DeskCardsSlot deskCards)
-        {
-            var result = new List<PictureBox>();
-            if (deskCards.Back != null)
-                result.Add(new PictureBox
-                {
-                    Size = new Size(deskCards.Back.Image.Width, deskCards.Back.Image.Height),
-                    Image = deskCards.Back.Image,
-                    Location = new Point(33, 249)
-                });
-
-            if (deskCards.Fore != null)
-                result.Add(new PictureBox
-                {
-                    Size = new Size(deskCards.Fore.Image.Width, deskCards.Fore.Image.Height),
-                    Image = deskCards.Fore.Image,
-                    Location = new Point(48, 264)
-                });
-            return result;
-        }
-
-        public void RedrawAll(GameModel game)
-        {
-            Controls.Clear();
-
-            if (game.BotHand.Count == 0)
-                OnLoseGame();
-            if (game.GamerHand.Count == 0)
-                OnWinGame();
-
-            gamerCards = DrawPlayersCards(game.GamerHand, 33, 422, false);
-            for (int cardNumber = gamerCards.Count - 1; cardNumber > -1; cardNumber--)
-            {
-                var iCardNumber = cardNumber;
-                Controls.Add(gamerCards[cardNumber]);
-                gamerCards[cardNumber].Click += (sender, args) =>
-                {
-                    if (game.WhosTurn == Players.Bot)
-                    {
-                        var result = game.CloseBotCard(iCardNumber);
-                        RedrawAll(game);
-                        if (result != null)
-                            OnWarningMessage(result.Item1, result.Item2);
-                        else
-                        {
-                            Thread.Sleep(500);
-                            game.CloseTurn();
-                            RedrawAll(game);
-                        }
-                    }
-                    else if (game.WhosTurn == Players.Gamer)
-                    {
-                        game.TurnPlayer2Bot(iCardNumber);
-                        RedrawAll(game);
-                        Thread.Sleep(500);
-                        game.CloseGamerCard();
-                        RedrawAll(game);
-                        Thread.Sleep(500);
-                        game.CloseTurn();
-                        RedrawAll(game);
-                        if (game.WhosTurn == Players.Bot)
-                            game.TurnBot2Player();
-                        RedrawAll(game);
-                    }
-
-                    RedrawAll(game);
-                };
-            }
-
-            botCards = DrawPlayersCards(game.BotHand, 33, 32, true);
-            for (int i = botCards.Count - 1; i >= 0; i--)
-                Controls.Add(botCards[i]);
-
-            PictureBox deck;
-            if (game.Deck.Count > 1)
-            {
-                deck = new PictureBox
-                {
-                    Size = new Size(Resource1.coloda.Width, Resource1.coloda.Height),
-                    Image = Resource1.coloda,
-                    Location = new Point(491, 400)
-                };
-                Controls.Add(deck);
-            }
-
-            if (game.DeskCards != null)
-            {
-                deskCards = DrawDeskCards(game.DeskCards);
-                foreach (var card in deskCards)
-                    Controls.Add(card);
-            }
+            var result = MessageBox.Show(text, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            return result == DialogResult.Yes;
         }
     }
 }
