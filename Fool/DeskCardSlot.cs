@@ -27,13 +27,5 @@ namespace Fool
             Fore = fore;
             ContainsFore = true;
         }
-
-        public void Clear()
-        {
-            Fore = null;
-            Back = null;
-            ContainsBack = false;
-            ContainsFore = false;
-        }
     }
 }
