@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,26 +21,23 @@ namespace Fool
         public Players WhosTurn { get; private set; }
         public Card TrumpCard { get; private set; }
         private Random rnd = new Random();
-        public bool FirstBotTurn;
 
         public GameModel()
         {
             Deck = new Queue<Card>();
             var fromCleanDeck = Card.CleanDeck.ToList();
-            while(Deck.Count != 36)
+            while (Deck.Count != 36)
             {
                 var number = rnd.Next(0, 35 - Deck.Count);
-                if (!Deck.Contains(fromCleanDeck[number]))
-                {
-                    Deck.Enqueue(fromCleanDeck[number]);
-                    fromCleanDeck.RemoveAt(number);
-                }       
+                if (Deck.Contains(fromCleanDeck[number])) continue;
+                Deck.Enqueue(fromCleanDeck[number]);
+                fromCleanDeck.RemoveAt(number);
             }
 
             GamerHand = new List<Card>();
             BotHand = new List<Card>();
 
-            for(int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
                 GamerHand.Add(Deck.Dequeue());
                 BotHand.Add(Deck.Dequeue());
@@ -65,30 +62,26 @@ namespace Fool
 
         public Tuple<string, string> CloseBotCard(int gamerCardNumber)
         {
-            if (IsClosingRight(GamerHand[gamerCardNumber], DeskCards[0].Back))
-            {
-                DeskCards[0].Close(GamerHand[gamerCardNumber]);
-                GamerHand.RemoveAt(gamerCardNumber);
-                return null;
-            }
-            return new Tuple<string, string>("Нарушение правил", "Неправильно выбрана карта");    
+            if (!IsClosingRight(GamerHand[gamerCardNumber], DeskCards[0].Back))
+                return new Tuple<string, string>("Нарушение правил", "Неправильно выбрана карта");
+            DeskCards[0].Close(GamerHand[gamerCardNumber]);
+            GamerHand.RemoveAt(gamerCardNumber);
+            return null;
         }
 
         public Tuple<string, string> TurnBot2Player()
         {
             var cardFound = false;
-            foreach(var card in BotHand)
+            foreach (var card in BotHand)
             {
-                if (card.Suit != TrumpCard.Suit)
-                {
-                    DeskCards = new List<DeskCardsSlot> { new DeskCardsSlot(card) };
-                    BotHand.Remove(card);
-                    cardFound = true;
-                    break;
-                }
+                if (card.Suit == TrumpCard.Suit) continue;
+                DeskCards = new List<DeskCardsSlot> { new DeskCardsSlot(card) };
+                BotHand.Remove(card);
+                cardFound = true;
+                break;
             }
 
-            if(!cardFound)
+            if (!cardFound)
             {
                 DeskCards.Add(new DeskCardsSlot(BotHand[0]));
                 BotHand.RemoveAt(0);
@@ -98,11 +91,9 @@ namespace Fool
 
             foreach (var card in GamerHand)
             {
-                if (IsClosingRight(card, DeskCards[0].Back))
-                {
-                    IsGamerCanClose = true;
-                    break;
-                }
+                if (!IsClosingRight(card, DeskCards[0].Back)) continue;
+                IsGamerCanClose = true;
+                break;
             }
 
             return IsGamerCanClose
@@ -118,22 +109,20 @@ namespace Fool
 
         public void CloseGamerCard()
         {
-            foreach(var card in BotHand)
+            foreach (var card in BotHand)
             {
-                if(IsClosingRight(card, DeskCards[0].Back))
-                {
-                    DeskCards[0].Close(card);
-                    BotHand.Remove(card);
-                    break;
-                }
+                if (!IsClosingRight(card, DeskCards[0].Back)) continue;
+                DeskCards[0].Close(card);
+                BotHand.Remove(card);
+                break;
             }
         }
 
         public void CloseTurn()
         {
-            if (DeskCards[0].ContainsFore == true)
+            if (DeskCards[0].ContainsFore)
             {
-                if(WhosTurn == Players.Gamer)
+                if (WhosTurn == Players.Gamer)
                 {
                     DeskCards.Clear();
                     AddCardsToGamersHands();
@@ -163,25 +152,25 @@ namespace Fool
             }
         }
 
-        public bool IsClosingRight (Card fore, Card back)
+        public bool IsClosingRight(Card fore, Card back)
         {
-            return back.Suit != TrumpCard.Suit 
-                ? (fore.Rank > back.Rank && fore.Suit == back.Suit) || fore.Suit == TrumpCard.Suit 
+            return back.Suit != TrumpCard.Suit
+                ? (fore.Rank > back.Rank && fore.Suit == back.Suit) || fore.Suit == TrumpCard.Suit
                 : fore.Suit == TrumpCard.Suit && fore.Rank > back.Rank;
         }
 
         private Players WhoFirst()
         {
             var rank = 0;
-            Players result = Players.Bot;
-            foreach(var card in BotHand)
+            var result = Players.Bot;
+            foreach (var card in BotHand)
                 if (card.Suit == TrumpCard.Suit && (rank == 0 || card.Rank < rank))
                 {
                     result = Players.Bot;
                     rank = card.Rank;
                 }
 
-            foreach(var card in GamerHand)
+            foreach (var card in GamerHand)
 
                 if (card.Suit == TrumpCard.Suit && (rank == 0 || card.Rank < rank))
                 {
@@ -204,26 +193,26 @@ namespace Fool
                     GamerHand.Add(Deck.Dequeue());
                     GamerHand.Remove(null);
                 }
+
                 while (BotHand.Count < 6 && Deck.Count != 0)
                 {
                     BotHand.Add(Deck.Dequeue());
                     BotHand.Remove(null);
                 }
             }
-
-            if (WhosTurn == Players.Bot)
+            else if (WhosTurn == Players.Bot)
             {
                 while (BotHand.Count < 6 && Deck.Count != 0)
                 {
                     BotHand.Add(Deck.Dequeue());
                     BotHand.Remove(null);
                 }
+
                 while (GamerHand.Count < 6 && Deck.Count != 0)
                 {
                     GamerHand.Add(Deck.Dequeue());
                     GamerHand.Remove(null);
                 }
-                    
             }
         }
     }
