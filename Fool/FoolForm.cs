@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -62,14 +62,14 @@ namespace Fool
 
             var image = game.TrumpCard.Image;
             image.RotateFlip(RotateFlipType.Rotate90FlipNone);
-            trump = new PictureBox()
+            trump = new PictureBox
             {
                 Image = image,
                 Size = Card.Size,
                 Location = new Point(459, 415)
             };
 
-            deck = new PictureBox()
+            deck = new PictureBox
             {
                 Image = Resource1.coloda,
                 Size = new Size(Resource1.coloda.Width, Resource1.coloda.Height),
@@ -80,7 +80,7 @@ namespace Fool
             botHand = new List<PictureBox>();
             var deltaCard = 15;
 
-            for (int i = 0; i < 36; i++)
+            for (var i = 0; i < 36; i++)
             {
                 gamerHand.Add(new PictureBox
                 {
@@ -100,7 +100,7 @@ namespace Fool
             deskBack = new List<PictureBox>();
             deskFore = new List<PictureBox>();
 
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
                 deskBack.Add(new PictureBox
                 {
@@ -133,7 +133,7 @@ namespace Fool
 
         private void RefreshImages()
         {
-            for (int i = 0; i < gamerHand.Count; i++)
+            for (var i = 0; i < gamerHand.Count; i++)
             {
                 if (i < game.GamerHand.Count && game.GamerHand[i] != null)
                 {
@@ -144,7 +144,7 @@ namespace Fool
                     gamerHand[i].Image = null;
             }
 
-            for (int i = 0; i < botHand.Count; i++)
+            for (var i = 0; i < botHand.Count; i++)
             {
                 if (i < game.BotHand.Count)
                 {
@@ -171,7 +171,7 @@ namespace Fool
             else
                 deck.Image = null;
 
-            for (int i = 0; i < deskBack.Count; i++)
+            for (var i = 0; i < deskBack.Count; i++)
             {
                 if (game.DeskCards == null)
                     deskBack[i].Image = null;
@@ -186,7 +186,7 @@ namespace Fool
                     deskBack[i].Image = null;
             }
 
-            for (int i = 0; i < deskFore.Count; i++)
+            for (var i = 0; i < deskFore.Count; i++)
             {
                 if (game.DeskCards == null)
                     deskFore[i].Image = null;
@@ -213,7 +213,7 @@ namespace Fool
 
         private void AddClickToGamerHand()
         {
-            for (int i = 0; i < 36; i++)
+            for (var i = 0; i < 36; i++)
             {
                 var iCardNumber = i;
                 gamerHand[i].Click += (sender, args) =>
