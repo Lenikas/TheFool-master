@@ -13,12 +13,7 @@ namespace Fool
         public Suits Suit { get; set; }
         public Bitmap Image;
         public static Size Size = new Size(Resource1._1_6.Width, Resource1._1_6.Height);
-
-        public Card Copy()
-        {
-            return new Card { Rank = this.Rank, Suit = this.Suit, Image = this.Image };
-        }
-
+        
         public static Card[] CleanDeck = {
             new Card { Rank = 6, Suit = Suits.Spade,    Image = Resource1._1_6 },
             new Card { Rank = 6, Suit = Suits.Heart,    Image = Resource1._2_6 },
