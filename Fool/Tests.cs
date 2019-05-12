@@ -22,7 +22,7 @@ namespace Fool
             
             var whosTurn = Players.Gamer;
             var trumpCard = Card.CleanDeck[1];
-            var desk = new DeskCardsSlot(Card.CleanDeck[15]);
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(Card.CleanDeck[15]) };
             var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
 
             game.CloseBotCard(0);
@@ -45,7 +45,7 @@ namespace Fool
 
             var whosTurn = Players.Bot;
             var trumpCard = Card.CleanDeck [3];
-            var desk = new DeskCardsSlot(null);
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(null) };
             desk.Clear();
             var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
 
@@ -66,7 +66,7 @@ namespace Fool
 
             var whosTurn = Players.Bot;
             var trumpCard = Card.CleanDeck[3];
-            var desk = new DeskCardsSlot(null);
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(null) };
             desk.Clear();
             var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
 
@@ -88,7 +88,7 @@ namespace Fool
 
             var whosTurn = Players.Gamer;
             var trumpCard = Card.CleanDeck [0];
-            var desk = new DeskCardsSlot(null);
+            var desk = new List<DeskCardsSlot> { new DeskCardsSlot(null) };
             desk.Clear();
             var game = new GameModel(botHand, gamerHand, deck, desk, trumpCard, whosTurn);
 

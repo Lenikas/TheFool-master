@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Fool
         public Card Back { get; private set; }
         public bool ContainsBack { get; private set; }
         public bool ContainsFore { get; private set; }
+        public static Size Size = new Size(90, 111);
 
         public DeskCardsSlot(Card back)
         {

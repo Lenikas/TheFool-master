@@ -17,7 +17,7 @@ namespace Fool
         public List<Card> GamerHand { get; set; }
         public Queue<Card> Deck { get; private set; }
         public List<Card> BotHand { get; set; }
-        public DeskCardsSlot DeskCards { get; set; }
+        public List<DeskCardsSlot> DeskCards { get; set; }
         public Players WhosTurn { get; private set; }
         public Card TrumpCard { get; private set; }
         private Random rnd = new Random();
@@ -53,7 +53,7 @@ namespace Fool
                 TurnBot2Player();
         }
 
-        public GameModel(List<Card> botHand, List<Card> gamerHand, Queue<Card> deck, DeskCardsSlot deskCards, Card trumpCard, Players whosTurn)
+        public GameModel(List<Card> botHand, List<Card> gamerHand, Queue<Card> deck, List<DeskCardsSlot> deskCards, Card trumpCard, Players whosTurn)
         {
             GamerHand = gamerHand;
             Deck = deck;
@@ -65,9 +65,9 @@ namespace Fool
 
         public Tuple<string, string> CloseBotCard(int gamerCardNumber)
         {
-            if (IsClosingRight(GamerHand[gamerCardNumber], DeskCards.Back))
+            if (IsClosingRight(GamerHand[gamerCardNumber], DeskCards[0].Back))
             {
-                DeskCards.Close(GamerHand[gamerCardNumber]);
+                DeskCards[0].Close(GamerHand[gamerCardNumber]);
                 GamerHand.RemoveAt(gamerCardNumber);
                 return null;
             }
@@ -81,7 +81,7 @@ namespace Fool
             {
                 if (card.Suit != TrumpCard.Suit)
                 {
-                    DeskCards = new DeskCardsSlot(card);
+                    DeskCards = new List<DeskCardsSlot> { new DeskCardsSlot(card) };
                     BotHand.Remove(card);
                     cardFound = true;
                     break;
@@ -90,7 +90,7 @@ namespace Fool
 
             if(!cardFound)
             {
-                DeskCards = new DeskCardsSlot(BotHand[0]);
+                DeskCards.Add(new DeskCardsSlot(BotHand[0]));
                 BotHand.RemoveAt(0);
             }
 
@@ -98,7 +98,7 @@ namespace Fool
 
             foreach (var card in GamerHand)
             {
-                if (IsClosingRight(card, DeskCards.Back))
+                if (IsClosingRight(card, DeskCards[0].Back))
                 {
                     IsGamerCanClose = true;
                     break;
@@ -112,7 +112,7 @@ namespace Fool
 
         public void TurnPlayer2Bot(int gamerCardNumber)
         {
-            DeskCards = new DeskCardsSlot(GamerHand[gamerCardNumber]);
+            DeskCards = new List<DeskCardsSlot> { new DeskCardsSlot(GamerHand[gamerCardNumber]) };
             GamerHand.RemoveAt(gamerCardNumber);
         }
 
@@ -120,9 +120,9 @@ namespace Fool
         {
             foreach(var card in BotHand)
             {
-                if(IsClosingRight(card, DeskCards.Back))
+                if(IsClosingRight(card, DeskCards[0].Back))
                 {
-                    DeskCards.Close(card);
+                    DeskCards[0].Close(card);
                     BotHand.Remove(card);
                     break;
                 }
@@ -131,7 +131,7 @@ namespace Fool
 
         public void CloseTurn()
         {
-            if (DeskCards.ContainsFore == true)
+            if (DeskCards[0].ContainsFore == true)
             {
                 if(WhosTurn == Players.Gamer)
                 {
@@ -146,17 +146,17 @@ namespace Fool
                     WhosTurn = Players.Gamer;
                 }
             }
-            if (DeskCards.ContainsFore == false)
+            else if (DeskCards[0].ContainsFore == false)
             {
                 if (WhosTurn == Players.Gamer)
                 {
-                    BotHand.Add(DeskCards.Back);
+                    BotHand.Add(DeskCards[0].Back);
                     DeskCards.Clear();
                     AddCardsToGamersHands();
                 }
                 else
                 {
-                    GamerHand.Add(DeskCards.Back);
+                    GamerHand.Add(DeskCards[0].Back);
                     DeskCards.Clear();
                     AddCardsToGamersHands();
                 }

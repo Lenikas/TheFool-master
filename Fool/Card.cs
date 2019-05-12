@@ -12,7 +12,7 @@ namespace Fool
         public int Rank { get; set; }
         public Suits Suit { get; set; }
         public Bitmap Image;
-        public static Size CardSize = new Size(Resource1._1_6.Width, Resource1._1_6.Height);
+        public static Size Size = new Size(Resource1._1_6.Width, Resource1._1_6.Height);
 
         public Card Copy()
         {

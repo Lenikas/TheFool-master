@@ -65,7 +65,7 @@ namespace Fool
             trump = new PictureBox()
             {
                 Image = image,
-                Size = Card.CardSize,
+                Size = Card.Size,
                 Location = new Point(459, 415)
             };
 
@@ -78,37 +78,42 @@ namespace Fool
 
             gamerHand = new List<PictureBox>();
             botHand = new List<PictureBox>();
-            var delta = 15;
+            var deltaCard = 15;
 
             for (int i = 0; i < 36; i++)
             {
                 gamerHand.Add(new PictureBox
                 {
-                    Size = Card.CardSize,
-                    Location = new Point(33 + delta * i, 422)
+                    Size = Card.Size,
+                    Location = new Point(33 + deltaCard * i, 422)
                 });
 
                 botHand.Add(new PictureBox
                 {
-                    Size = Card.CardSize,
-                    Location = new Point(33 + delta * i, 32)
+                    Size = Card.Size,
+                    Location = new Point(33 + deltaCard * i, 32)
                 });
             }
+
+            var deltaCardSlot = 20 + DeskCardsSlot.Size.Width;
 
             deskBack = new List<PictureBox>();
             deskFore = new List<PictureBox>();
 
-            deskBack.Add(new PictureBox
+            for (int i = 0; i < 6; i++)
             {
-                Size = Card.CardSize,
-                Location = new Point(33, 249)
-            });
+                deskBack.Add(new PictureBox
+                {
+                    Size = Card.Size,
+                    Location = new Point(33 + deltaCardSlot * i, 249)
+                });
 
-            deskFore.Add(new PictureBox
-            {
-                Size = Card.CardSize,
-                Location = new Point(48, 264)
-            });
+                deskFore.Add(new PictureBox
+                {
+                    Size = Card.Size,
+                    Location = new Point(48 + deltaCardSlot * i, 264)
+                });
+            }
         }
 
         private void AddComponentsToControls()
@@ -166,29 +171,43 @@ namespace Fool
             else
                 deck.Image = null;
 
-            if (game.DeskCards != null && game.DeskCards.ContainsBack)
+            for (int i = 0; i < deskBack.Count; i++)
             {
-                deskBack[0].Image = game.DeskCards.Back.Image;
-                deskBack[0].BringToFront();
+                if (game.DeskCards == null)
+                    deskBack[i].Image = null;
+                else if (i >= game.DeskCards.Count)
+                    deskBack[i].Image = null;
+                else if (game.DeskCards[i].ContainsBack)
+                {
+                    deskBack[i].Image = game.DeskCards[i].Back.Image;
+                    deskBack[i].BringToFront();
+                }
+                else
+                    deskBack[i].Image = null;
             }
-            else
-                deskBack[0].Image = null;
 
-            if (game.DeskCards != null && game.DeskCards.ContainsFore)
+            for (int i = 0; i < deskFore.Count; i++)
             {
-                deskFore[0].Image = game.DeskCards.Fore.Image;
-                deskFore[0].BringToFront();
+                if (game.DeskCards == null)
+                    deskFore[i].Image = null;
+                else if (i >= game.DeskCards.Count)
+                    deskFore[i].Image = null;
+                else if (game.DeskCards[i].ContainsFore)
+                {
+                    deskFore[i].Image = game.DeskCards[i].Fore.Image;
+                    deskFore[i].BringToFront();
+                }
+                else
+                    deskFore[i].Image = null;
             }
-            else
-                deskFore[0].Image = null;
 
             Update();
             Invalidate();
             Refresh();
 
-            if (game.BotHand.Count == 0 && game.DeskCards.Back == null)
+            if (game.BotHand.Count == 0 && game.DeskCards.Count == 0)
                 OnLoseGame();
-            if (game.GamerHand.Count == 0 && game.DeskCards.Back == null)
+            if (game.GamerHand.Count == 0 && game.DeskCards.Count == 0)
                 OnWinGame();
         }
 
