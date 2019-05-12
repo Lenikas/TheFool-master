@@ -14,14 +14,14 @@ namespace Fool
 
     public class GameModel
     {
-        public List<Card> GamerHand { get; set; }
-        public Queue<Card> Deck { get; private set; }
-        public List<Card> BotHand { get; set; }
+        public List<Card> GamerHand { get; }
+        public Queue<Card> Deck { get; }
+        public List<Card> BotHand { get; }
         public List<DeskCardsSlot> DeskCards { get; set; }
         public Players WhosTurn { get; private set; }
-        public Card TrumpCard { get; private set; }
+        public Card TrumpCard { get; }
         private Random rnd = new Random();
-
+        
         public GameModel()
         {
             Deck = new Queue<Card>();
